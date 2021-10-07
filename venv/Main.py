@@ -1,12 +1,21 @@
+# find out if an application is okay
+# if for the pie chart want to select by check boxes
+# any features they want it to have for now
 import info
 import matplotlib.pyplot as plt
 from notion.client import NotionClient
 import requests
+from tkinter import *
+from tkinter import ttk
+import tkinter as tk
 
 collection = {}
 labels = []
 sizes = []
 
+scores = tk.Tk()
+cols = ('Rank', 'Genre', 'Quantity')
+dataTable = ttk.Treeview(scores, columns=cols, show='headings')
 
 def test_internet():
     url = "http://www.google.com"
@@ -14,6 +23,7 @@ def test_internet():
     try:
         r = requests.get(url, timeout=timeout)
     except (requests.ConnectionError, requests.Timeout) as exception:
+
         quit()
 
 
@@ -30,20 +40,33 @@ def collect_data_from_notion():
                 collection[tag] = 1
 
 
-def display_genre_count():
-    sortingOption = int(input("Would you like to sort the genres alphabetically"
-                              " or in descending order of frequency? "))
-    if sortingOption == 1:
-        for key in sorted(collection.keys()):
-            print(key + ": " + str(collection[key]))
-            labels.append(key)
-            sizes.append(collection[key])
-    else:
-        collection = dict(sorted(collection.items(), key=lambda item: item[1]))  # sorts by value  in increasing order
-        for key in reversed(collection.keys()):
-            print(key + ": " + str(collection[key]))
-            labels.append(key)
-            sizes.append(collection[key])
+def quantity_Order():
+    counter = 1
+
+    dataTable.delete(*dataTable.get_children())
+
+    dataInOrder = dict(sorted(data.items(), key=lambda item: item[1]))  # sorts by value  in increasing order
+    for key in reversed(dataInOrder.keys()):
+        labels.append(key)
+        sizes.append(dataInOrder[key])
+        tempGenre = str(key)
+        tempQuantity = str(dataInOrder[key])
+        dataTable.insert("", "end", values=(counter, tempGenre, tempQuantity))
+        counter = counter + 1
+
+
+def abcOrder():
+    counter = 1
+
+    dataTable.delete(*dataTable.get_children())
+
+    for key in sorted(data.keys()):
+        labels.append(key)
+        sizes.append(data[key])
+        tempGenre = str(key)
+        tempQuantity = str(data[key])
+        dataTable.insert("", "end", values=(counter, tempGenre, tempQuantity))
+        counter = counter + 1
 
 
 def display_chart():
@@ -61,7 +84,17 @@ def run():
 
     test_internet()
     collect_data_from_notion()
-    display_genre_count()
+
+    for col in cols:
+        dataTable.heading(col, text=col)
+    dataTable.grid(row=1, column=0, columnspan=3)
+
+    showScoresInABC = tk.Button(scores, text="Alphabetical Order", width=15,
+                                command=abcOrder).grid(row=4, column=0)
+    showScoresInQuantityDescending = tk.Button(scores, text="Descending order",
+                                               width=15, command=quantity_Order).grid(row=4, column=1)
+
+    scores.mainloop()
 
     while choice.lower() != 'yes' or choice.lower() != 'no':
         choice = input("Would you like to display the pie chart? (yes or no)\n")
