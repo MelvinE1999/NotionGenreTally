@@ -1,21 +1,27 @@
 # find out if an application is okay
 # if for the pie chart want to select by check boxes
 # any features they want it to have for now
+
+#if notionpy doesnt work could have her export to csv and read from there
 import info
 import matplotlib.pyplot as plt
 from notion.client import NotionClient
 import requests
 from tkinter import *
+from tkinter.filedialog import askopenfile
+from tkinter.filedialog import askopenfilename
+from tkinter import Tk
 from tkinter import ttk
 import tkinter as tk
+
 
 collection = {}
 labels = []
 sizes = []
 
-scores = tk.Tk()
+dataWindow = tk.Tk()
 cols = ('Rank', 'Genre', 'Quantity')
-dataTable = ttk.Treeview(scores, columns=cols, show='headings')
+dataTable = ttk.Treeview(dataWindow, columns=cols, show='headings')
 
 def test_internet():
     url = "http://www.google.com"
@@ -78,23 +84,34 @@ def display_chart():
     plt.show()
 
 
+def open_file():
+    Tk().withdraw()
+    file = askopenfile(mode='r', filetypes=[('comma-seperated values', '*.csv')])
+    # need to add parsing below
+
+
+def close():
+    dataWindow.wm_withdraw() # closes window might be helpful
+
+
 def run():
     displayChart = True
     choice = ''
 
-    test_internet()
-    collect_data_from_notion()
+    # test_internet()    not needed until notionpy fixed
+    # collect_data_from_notion()  notionpy is not working at the moment
 
     for col in cols:
         dataTable.heading(col, text=col)
     dataTable.grid(row=1, column=0, columnspan=3)
 
-    showScoresInABC = tk.Button(scores, text="Alphabetical Order", width=15,
+    showScoresInABC = tk.Button(dataWindow, text="Alphabetical Order", width=15,
                                 command=abcOrder).grid(row=4, column=0)
-    showScoresInQuantityDescending = tk.Button(scores, text="Descending order",
+    showScoresInQuantityDescending = tk.Button(dataWindow, text="Descending order",
                                                width=15, command=quantity_Order).grid(row=4, column=1)
+    closeButton = tk.Button(dataWindow, text="close",width=15, command=close).grid(row=4, column=2)
 
-    scores.mainloop()
+    dataWindow.mainloop()
 
     while choice.lower() != 'yes' or choice.lower() != 'no':
         choice = input("Would you like to display the pie chart? (yes or no)\n")
