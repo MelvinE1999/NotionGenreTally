@@ -84,10 +84,38 @@ def display_chart():
     plt.show()
 
 
-def open_file():
+def get_comma_number_of_genre(listOfHeader):
+    commaCounter = 0
+    if(len(listOfHeader) == 0): return  # gaurdian clause
+    listOfHeader = listOfHeader[1:] # gets rid of the formatting at the beginning of the file
+    headers = listOfHeader.split(',')
+    for header in headers:
+        if header == "Column" or header == "column":
+            return commaCounter
+        else:
+            commaCounter = commaCounter + 1
+
+
+
+def get_genres(line, commaNumber):
+    for char in line:
+        if(commaNumber == commaCount):
+            if(char == '\"'):
+                continue
+        # add a checker for open and closed quotes
+        # store data in the setup dictionaries
+        if(char == ','):
+            commaCount = commaCount + 1
+
+
+def get_data_from_file():
     Tk().withdraw()
     file = askopenfile(mode='r', filetypes=[('comma-seperated values', '*.csv')])
     # need to add parsing below
+    header = next(file)
+    commaNumber = get_comma_number_of_genre(header)
+    for line in file.readlines(): # loop for the rest of the file minus header
+        get_genres(line, commaNumber)
 
 
 def close():
@@ -123,4 +151,5 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    #run()
+    get_data_from_file()
